@@ -1,3 +1,13 @@
+# Inference Frontend App
+
+#### Goal: Enable users to apply trained AI models to real-world data through a mobile-friendly interface.
+- **Technologies**: Developed using React.
+- **Features**:
+- Extracts model ID from URLs
+- Accesses the camera to capture images
+- Sends images and model ID to the backend
+- Displays prediction results in real-time
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
