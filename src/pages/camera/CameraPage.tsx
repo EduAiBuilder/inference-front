@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Camera, CameraType } from '../../Camera';
 import styled from 'styled-components';
 import ControlPanel from '../../components/ControlPannel/ControlPanel';
+import { getClassificationData } from '../../clients/classification.client';
 
 const Wrapper = styled.div`
     position: fixed;
@@ -21,6 +22,31 @@ const FullScreenImagePreview = styled.div<{ image: string | null }>`
     background-repeat: no-repeat;
     background-position: center;
 `;
+
+async function decodeAndSendBase64Image(base64Str: string) {
+    // Strip the header (e.g., "data:image/jpeg;base64,")
+    const base64Header = 'data:image/jpeg;base64,';
+    if (base64Str.startsWith(base64Header)) {
+        base64Str = base64Str.replace(base64Header, '');
+    }
+
+    // Decode the base64 string to binary data
+    const byteCharacters = atob(base64Str);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'image/jpeg' });
+
+    // Create a File object from the blob
+    const file = new File([blob], 'image.jpg', { type: 'image/jpeg' });
+
+    // Create FormData and append the file
+    const formData = new FormData();
+    formData.append('file', file);
+    return formData;
+}
 const CameraPage = () => {
     const [numberOfCameras, setNumberOfCameras] = useState(0);
     const [image, setImage] = useState<string | null>(null);
@@ -29,6 +55,13 @@ const CameraPage = () => {
     const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
     const [activeDeviceId, setActiveDeviceId] = useState<string | undefined>(undefined);
     const [torchToggled, setTorchToggled] = useState<boolean>(false);
+
+    const handelPictureTaken = async (image: string) => {
+        setImage(image);
+        const formData = await decodeAndSendBase64Image(image);
+        const response = await getClassificationData(formData);
+        console.log(response);
+    };
 
     useEffect(() => {
         (async () => {
@@ -41,12 +74,14 @@ const CameraPage = () => {
     return (
         <Wrapper>
             {showImage ? (
-                <FullScreenImagePreview
-                    image={image}
-                    onClick={() => {
-                        setShowImage(!showImage);
-                    }}
-                />
+                <>
+                    <FullScreenImagePreview
+                        image={image}
+                        onClick={() => {
+                            setShowImage(!showImage);
+                        }}
+                    />
+                </>
             ) : (
                 <Camera
                     ref={camera}
@@ -71,7 +106,7 @@ const CameraPage = () => {
                 numberOfCameras={numberOfCameras}
                 devices={devices}
                 setActiveDeviceId={setActiveDeviceId}
-                setImage={setImage}
+                handelPictureTaken={handelPictureTaken}
                 setShowImage={setShowImage}
                 showImage={showImage}
                 setTorchToggled={setTorchToggled}

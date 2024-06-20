@@ -6,7 +6,7 @@ export interface ControlPanelPropsInterface {
     devices: MediaDeviceInfo[];
     setShowImage: (show: boolean) => void;
     showImage: boolean;
-    setImage: (image: string) => void;
+    handelPictureTaken: (image: string) => void;
     camera: React.RefObject<CameraType>;
     torchToggled: boolean;
     setTorchToggled: (toggled: boolean) => void;

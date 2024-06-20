@@ -9,7 +9,7 @@ const ControlPanel = ({
     devices,
     setShowImage,
     showImage,
-    setImage,
+    handelPictureTaken,
     camera,
     torchToggled,
     setTorchToggled,
@@ -38,7 +38,7 @@ const ControlPanel = ({
                     if (camera.current) {
                         const photo = camera.current.takePhoto();
                         console.log(photo);
-                        setImage(photo as string);
+                        handelPictureTaken(photo as string);
                     }
                 }}
             />
